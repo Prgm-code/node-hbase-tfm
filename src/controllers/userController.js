@@ -97,6 +97,7 @@ exports.deletes = (req, res) => {
 };
 
 exports.login = (req, res) => {
+  console.log(req.body);
   UserModel.validateUser( req.body.userId, req.body.password  , async (err, data) => {
     if (err) {
       res.status(500).send({
@@ -107,7 +108,7 @@ exports.login = (req, res) => {
       { sub: req.body.userId, expiresIn: 60 * 60 *24 },
       process.env.JWT_SECRET);
     console.log(token);
-    res.status(200).json(token);
+    res.status(200).json({token: token});
   }
 
   });

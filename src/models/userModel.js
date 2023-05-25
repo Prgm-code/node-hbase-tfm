@@ -32,12 +32,14 @@ exports.getAllUsers = (result) => {
 
     rows.forEach((row) => {
       if (!userMap[row.key]) {
+        const modifiedTimestamp = new Date(row.timestamp).toLocaleString();
         userMap[row.key] = {
           id: row.key,
           firstName: "",
           lastName: "",
           email: "",
           password: "",
+          timestamp: modifiedTimestamp,
         };
       }
 

@@ -11,12 +11,17 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "fs": "^0.0.1-security",
     "hbase": "^0.6.1",
     "hbase-client": "^1.7.0",
     "jsonwebtoken": "^9.0.0",
-    "util": "^0.12.5"
+    "morgan": "^1.10.0",
+    "stream": "^0.0.2",
+    "util": "^0.12.5",
+    "webhdfs": "^1.2.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
