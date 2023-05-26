@@ -16,10 +16,10 @@ router.delete('/user/:userId',jwtVerify, deletes);
 
 //hdfs routes
 
-router.post('/hdfs/upload', upload.single('file'), hdfsController.upload);
-router.get('/hdfs/read/:path', hdfsController.read);
-router.get('/hdfs/list/', hdfsController.list);
-router.delete('/hdfs/remove/:path', hdfsController.remove);
+router.post('/hdfs/upload',jwtVerify, upload.single('file'), hdfsController.upload);
+router.get('/hdfs/read/:path',jwtVerify, hdfsController.read);
+router.get('/hdfs/list/',jwtVerify, hdfsController.list);
+router.delete('/hdfs/remove/:path',jwtVerify, hdfsController.remove);
 
 
 module.exports = router;

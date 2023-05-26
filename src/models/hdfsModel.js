@@ -12,45 +12,42 @@ const hdfs = WebHDFS.createClient({
 });
 
 // Leer archivo
-const read = (path) => {
+const read = (path, response) => {
   const remoteFileStream = hdfs.createReadStream(path);
-  let data = '';
 
   return new Promise((resolve, reject) => {
-    pipeline(
-      remoteFileStream,
-      new stream.Writable({
-        write(chunk, encoding, callback) {
-          data += chunk.toString();
-          callback();
-        }
-      })
-    ).then(() => {
-      resolve(data);
-    }).catch((error) => {
+    remoteFileStream.on('error', (error) => {
       console.error(error);
       reject(error);
     });
+
+    remoteFileStream.on('end', () => {
+      resolve();
+    });
+
+    remoteFileStream.pipe(response);
   });
 };
 
 
 // Escribir archivo
-const write = async (dataStream, remoteFilePath) => {
- return new Promise((resolve, reject) => {
-        hdfs.createWriteStream(remoteFilePath, function(error, response) {
-            if (error) {
-                console.error(error);
-                reject(error);
-            } else {
-                dataStream.pipe(response);
-                resolve();
-            }
-        }
-    );
-  });
 
-};
+const write = (dataStream, remoteFilePath) => {
+  
+  console.log('remoteFilePath',remoteFilePath);  
+  return new Promise((resolve, reject) => {
+     const remoteFileStream = hdfs.createWriteStream(remoteFilePath);
+     dataStream.pipe(remoteFileStream);
+     remoteFileStream.on('error', (error) => {
+         console.error(error);
+         reject(error);
+     });
+     remoteFileStream.on('finish', () => {
+         resolve();
+     });
+   });
+ };
+ 
 
 // Crear directorio
 const mkdir = async (path) => {
@@ -71,9 +68,9 @@ const mkdir = async (path) => {
 
 // Eliminar archivo
 const remove = async (path) => {
-try {
-    await new Promise((resolve, reject) => {
-      hdfs.unlink(path, (err) => {
+
+   return await new Promise((resolve, reject) => {
+      hdfs.rmdir(path, (err) => {
         if (err) {
           console.error(err);
           reject(err);
@@ -84,16 +81,12 @@ try {
     });
   }
 
-  catch (error) {
-  console.log(error);
-    return error;
-  }
-};
+  
 
 // Listar directorio
 const list = async (path) => {
-  try {
-    const files = await new Promise((resolve, reject) => {
+  
+   return await new Promise((resolve, reject) => {
       hdfs.readdir(path, (err, files) => {
         if (err) {
           console.error(err);
@@ -104,12 +97,12 @@ const list = async (path) => {
         }
       });
     });
-    return files;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-};
+
+  };
+
+
+
+
 
 
 module.exports = { read, write, remove, list, mkdir };
