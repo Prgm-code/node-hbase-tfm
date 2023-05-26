@@ -17,6 +17,13 @@ app.use(express.json());
 
 app.use('/', userRoutes);
 
+function errorHandler(err, req, res, next) {
+  console.error(err);
+  res.status(500).json({ error: err.toString() });
+}
+
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 3500;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
