@@ -35,7 +35,7 @@ exports.create = (req, res, next) => {
       // Comprueba si existe el usuario por userId
       UserModel.getUserById(userId, (err, data) => {
         if (data) {
-          console.log(data);
+          
           return res.status(400).json({ message: "El usuario ya existe" });
         } else {
           // Comprueba la longitud de la contraseña
@@ -96,7 +96,7 @@ exports.login = (req, res, next) => {
     const token = await jwt.sign(
       { sub: req.body.userId, expiresIn: 60 * 60 *24 },
       process.env.JWT_SECRET);
-    console.log(token);
+    
     res.status(200).json({token: token});
   }
 
