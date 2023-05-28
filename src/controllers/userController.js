@@ -6,19 +6,17 @@ const UserModel = require('../models/userModel');
 dotenv.config();
 
 
-exports.index = (req, res) => {
+exports.index = (req, res,next) => {
   UserModel.getAllUsers((err, data) => {
     if (err) {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users."
-      });
+     next(err);
     } else {
       res.json( data );
     }
   });
 };
 
-exports.create = (req, res) => {
+exports.create = (req, res, next) => {
   const user = {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -49,10 +47,7 @@ exports.create = (req, res) => {
             // Crea el usuario
             UserModel.createUser(user, (err, data) => {
               if (err) {
-                res.status(500).json({
-                  message:
-                    err.message || "Some error occurred while creating the user."
-                });
+                next(err);
               } else {
                 res.status(200).json({ data });
               }
@@ -65,7 +60,7 @@ exports.create = (req, res) => {
 };
 
 
-exports.update = (req, res) => {
+exports.update = (req, res, next) => {
   const user = {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -75,34 +70,28 @@ exports.update = (req, res) => {
 
   UserModel.updateUser(req.params.userId, user, (err, data) => {
     if (err) {
-      res.status(500).send({
-        message: err.message || "Some error occurred while updating the user."
-      });
+      next(err);
     } else {
       res.status(200).json({ data });
     }
   });
 };
 
-exports.deletes = (req, res) => {
+exports.deletes = (req, res, next) => {
   UserModel.deleteUser(req.params.userId, (err, data) => {
     if (err) {
-      res.status(500).send({
-        message: err.message ||       "Some error occurred while deleting the user."
-    });
+     next(err);
   } else {
     res.status(200).json({ data });
   }
 });
 };
 
-exports.login = (req, res) => {
+exports.login = (req, res, next) => {
   console.log(req.body);
   UserModel.validateUser( req.body.userId, req.body.password  , async (err, data) => {
     if (err) {
-      res.status(500).send({
-        message: err.message 
-    });
+      next(err);
   } else {
     const token = await jwt.sign(
       { sub: req.body.userId, expiresIn: 60 * 60 *24 },
@@ -126,12 +115,10 @@ exports.getUserByEmail = (req, res) => {
 });
 }
 
-exports.getUserById = (req, res) => {
+exports.getUserById = (req, res, next) => {
   UserModel.getUserById(req.params.userId, (err, data) => {
     if (err) {
-      res.status(500).send({
-        message: err.message 
-    });
+      next(err);
   } else {
     res.status(200).json({ data });
   }
@@ -139,7 +126,7 @@ exports.getUserById = (req, res) => {
 }
 
 exports.jwtVerify = (req, res, next) => {
-
+  console.log(req.headers);
   const token = req.headers['x-access-token'];
 
   if (!token) {
@@ -148,7 +135,7 @@ exports.jwtVerify = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(500).json({ auth: false, message: 'Failed to authenticate token.' });
+      return res.status(401).json({ auth: false, message: 'Failed to authenticate token.' });
     }
 
     req.userId = decoded.sub;
